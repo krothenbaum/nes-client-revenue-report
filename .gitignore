@@ -1,1 +1,4 @@
-node_nodules
+node_modules
+.next
+.vscode
+*.csv
