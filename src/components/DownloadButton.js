@@ -23,7 +23,7 @@ const DownloadButton = ({ data, years }) => {
 
   return (
     <Button onClick={handleClick} styled={{ marginBottom: '8px' }}>
-      Download
+      Download XLSX
     </Button>
   );
 };
