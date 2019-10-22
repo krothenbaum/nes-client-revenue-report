@@ -1,6 +1,4 @@
 import csv from 'csvtojson';
-import { object } from 'prop-types';
-const csvFilePath = './ccr_012018_082019.csv';
 
 const processName = item => {
   return item.split(':')[0];
@@ -32,7 +30,7 @@ const randomId = () =>
     .toString(36)
     .substr(2, 9);
 
-const processCsv = async () => {
+const processCsv = async csvFile => {
   const jsonArray = await csv({
     ignoreEmpty: true,
     colParser: {
@@ -41,7 +39,7 @@ const processCsv = async () => {
       amount: item => processAmount(item),
     },
   })
-    .fromFile(csvFilePath)
+    .fromString(csvFile)
     .preFileLine((rawData, index) => {
       if (index === 0) {
         return rawData.toLowerCase();
@@ -120,8 +118,10 @@ const processCsv = async () => {
     return acc;
   }, {});
 
-  console.log('dataByClient', dataByClient['PG&E-Sac.'].id);
-  console.log('dataByClient', dataByYear[2019]['PG&E-Sac.'].id);
+  return {
+    dataByClient,
+    dataByYear,
+  };
 };
 
-processCsv();
+export default processCsv;
