@@ -5,12 +5,15 @@ const DownloadButton = ({ data, years }) => {
   const handleClick = () => {
     const wb = XLSX.utils.book_new();
     data.forEach((items, index) => {
-      const wsData = items.map(item => {
-        return {
-          Client: item.name,
-          Revenue: item.totalRevenue,
-        };
-      });
+      const wsData = items
+        .map(item => {
+          return {
+            ID: item.id,
+            Client: item.name,
+            Revenue: item.totalRevenue,
+          };
+        })
+        .sort((a, b) => b.Revenue - a.Revenue);
       const ws = XLSX.utils.json_to_sheet(wsData);
       XLSX.utils.book_append_sheet(wb, ws, years[index]);
     });
