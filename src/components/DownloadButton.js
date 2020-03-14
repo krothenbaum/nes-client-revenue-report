@@ -1,5 +1,6 @@
 import { Button } from 'antd';
 import XLSX from 'xlsx';
+import { monthsArr } from '../constants';
 
 const DownloadButton = ({ data, years }) => {
   const handleClick = () => {
@@ -7,11 +8,18 @@ const DownloadButton = ({ data, years }) => {
     data.forEach((items, index) => {
       const wsData = items
         .map(item => {
-          return {
+          const client = {
             ID: item.id,
             Client: item.name,
-            Revenue: item.totalRevenue,
           };
+
+          monthsArr.forEach((month, index) => {
+            client[month] = item[index];
+          });
+
+          client.Revenue = item.totalRevenue;
+
+          return client;
         })
         .sort((a, b) => b.Revenue - a.Revenue);
       const ws = XLSX.utils.json_to_sheet(wsData);

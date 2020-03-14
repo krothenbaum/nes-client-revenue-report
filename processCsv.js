@@ -1,5 +1,19 @@
 import csv from 'csvtojson';
 
+class Client {
+  constructor(id, name, amount) {
+    this.id = id;
+    this.amounts = [amount];
+    this.totalRevenue = amount;
+    this.name = name;
+  }
+
+  addAmount(amount) {
+    this.amounts = [...this.amounts, amount];
+    this.totalRevenue = this.totalRevenue + amount;
+  }
+}
+
 const processName = item => {
   return item.split(':')[0];
 };
@@ -20,9 +34,6 @@ const processAmount = item => {
   }
   return parseFloat(item.replace(/[^\d.]/g, ''));
 };
-
-const findId = (name, obj) =>
-  obj[Object.keys(obj).find(key => key === name)].id || randomId;
 
 const randomId = () =>
   '_' +
@@ -54,72 +65,53 @@ const processCsv = async csvFile => {
       return new Array(countOfCommas + 1).join(',');
     });
 
-  const dataByClient = jsonArray.reduce((acc, curr) => {
-    const { date, name, amount } = curr;
-
-    if (!date || !name || !amount) return acc;
-
-    const year = date.getFullYear();
-
-    const id = randomId();
-
-    if (!acc[name]) {
-      acc[name] = {
-        id,
-        name,
-        [year]: { amounts: [amount], totalRevenue: amount },
-      };
-      return acc;
-    }
-
-    if (!acc[name][year]) {
-      acc[name][year] = { amounts: [amount], totalRevenue: amount };
-      return acc;
-    }
-
-    acc[name][year].totalRevenue = acc[name][year].totalRevenue + amount;
-    acc[name][year].amounts.push(amount);
-
-    return acc;
-  });
-
   const dataByYear = jsonArray.reduce((acc, curr) => {
     const { date, name, amount } = curr;
 
     if (!date || !name || !amount) return acc;
 
     const year = date.getFullYear();
-    const id = findId(name, dataByClient);
+    const month = date.getMonth();
+    const id = randomId();
 
     if (!acc[year]) {
       acc[year] = {
-        [name]: {
-          id,
-          totalRevenue: amount,
-          amounts: [amount],
-          name,
+        months: {
+          [month]: {
+            [name]: new Client(id, name, amount),
+          },
         },
+        [name]: new Client(id, name, amount),
       };
+
+      return acc;
+    }
+
+    if (!acc[year].months[month]) {
+      acc[year].months[month] = {
+        [name]: new Client(id, name, amount),
+      };
+
       return acc;
     }
 
     if (!acc[year][name]) {
-      acc[year][name] = {
-        id,
-        totalRevenue: amount,
-        amounts: [amount],
-        name,
-      };
+      acc[year][name] = new Client(id, name, amount);
+    }
+
+    if (!acc[year].months[month][name]) {
+      acc[year].months[month][name] = new Client(id, name, amount);
+
       return acc;
     }
 
-    acc[year][name].totalRevenue = acc[year][name].totalRevenue + amount;
-    acc[year][name].amounts.push(amount);
+    acc[year][name].addAmount(amount);
+    acc[year].months[month][name].addAmount(amount);
+
     return acc;
   }, {});
 
   return {
-    dataByClient,
     dataByYear,
   };
 };

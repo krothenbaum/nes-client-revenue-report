@@ -30,6 +30,7 @@ const Index = () => {
     acceptedFiles.forEach(file => reader.readAsText(file));
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
   return (
     <>
       <Head>
@@ -63,7 +64,6 @@ const Index = () => {
                 style={{
                   backgroundColor: '#D6E5FD',
                   padding: '64px',
-                  // border: '4px dotted #002180',
                   borderRadius: '8px',
                   boxShadow: '0 2px 0 hsla(225, 41%, 18%, 0.15)',
                   display: 'flex',
