@@ -41,8 +41,8 @@ const randomId = () =>
     .toString(36)
     .substr(2, 9);
 
-const processCsv = async csvFile => {
-  const jsonArray = await csv({
+const toJson = async csvFile => {
+  return await csv({
     ignoreEmpty: true,
     colParser: {
       name: item => processName(item),
@@ -64,6 +64,11 @@ const processCsv = async csvFile => {
 
       return new Array(countOfCommas + 1).join(',');
     });
+};
+
+const processCsv = async csvFile => {
+  const jsonArray = await toJson(csvFile);
+  console.log('jsonArray', jsonArray);
 
   const dataByYear = jsonArray.reduce((acc, curr) => {
     const { date, name, amount } = curr;
@@ -136,3 +141,4 @@ const processCsv = async csvFile => {
 };
 
 export default processCsv;
+export { toJson };
