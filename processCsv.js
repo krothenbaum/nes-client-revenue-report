@@ -71,17 +71,41 @@ const processCsv = async csvFile => {
     if (!date || !name || !amount) return acc;
 
     const year = date.getFullYear();
-    const month = date.getMonth();
     const id = randomId();
 
     if (!acc[year]) {
       acc[year] = {
-        months: {
-          [month]: {
-            [name]: new Client(id, name, amount),
-          },
-        },
         [name]: new Client(id, name, amount),
+      };
+
+      return acc;
+    }
+
+    if (!acc[year][name]) {
+      acc[year][name] = new Client(id, name, amount);
+
+      return acc;
+    }
+
+    acc[year][name].addAmount(amount);
+
+    return acc;
+  }, {});
+
+  jsonArray.reduce((acc, curr) => {
+    const { date, name, amount } = curr;
+
+    if (!date || !name || !amount) return acc;
+
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const { id } = acc[year][name];
+
+    if (!acc[year].months) {
+      acc[year].months = {
+        [month]: {
+          [name]: new Client(id, name, amount),
+        },
       };
 
       return acc;
@@ -95,21 +119,16 @@ const processCsv = async csvFile => {
       return acc;
     }
 
-    if (!acc[year][name]) {
-      acc[year][name] = new Client(id, name, amount);
-    }
-
     if (!acc[year].months[month][name]) {
       acc[year].months[month][name] = new Client(id, name, amount);
 
       return acc;
     }
 
-    acc[year][name].addAmount(amount);
     acc[year].months[month][name].addAmount(amount);
 
     return acc;
-  }, {});
+  }, dataByYear);
 
   return {
     dataByYear,
