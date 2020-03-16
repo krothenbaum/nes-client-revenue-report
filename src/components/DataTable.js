@@ -23,6 +23,8 @@ const DataTable = ({ reportData }) => {
             ].totalRevenue.toLocaleString(undefined, {
               style: 'currency',
               currency: 'USD',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             }),
           };
 
@@ -33,6 +35,8 @@ const DataTable = ({ reportData }) => {
                 {
                   style: 'currency',
                   currency: 'USD',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 },
               );
             } else {
